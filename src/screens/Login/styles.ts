@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 import { general, colors, fonts } from '../../styles/index';
 
 const styles = StyleSheet.create({
@@ -25,11 +25,34 @@ const styles = StyleSheet.create({
 
   },
 
-  footer: {
-   flex: 1,
-   alignItems: 'center',
-   justifyContent: 'flex-end'
-  }
+  passwordInputView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+
+  passwordInput: {
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+    width: Dimensions.get('screen').width - 70
+  },
+
+  showPassButton: {
+    width: 30,
+    height: 65,
+    backgroundColor: colors.secondary[1],
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  rememberView: {
+    alignSelf: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
 });
 
 export default styles;
