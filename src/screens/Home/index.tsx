@@ -10,6 +10,9 @@ import { useEffect, useState } from 'react';
 import IProduct from '../../@types/interfaces';
 import api from '../../services/api';
 import { PropsHome } from '../../@types/routes';
+import * as SecureStore from 'expo-secure-store';
+import Spinner from '../../components/Spinner';
+import ExtraPortionCard from '../../components/ExtraPortionCard';
 
 function Home({ route, navigation }: PropsHome) {
   const [search, setSearch] = useState<string>();
@@ -29,7 +32,7 @@ function Home({ route, navigation }: PropsHome) {
       }
     }).catch(err => {
       console.error(err);
-      alert('Deu merda lá');
+      Alert.alert('Erro', 'Não foi possível carregar os dados, por favor tente novamente.');
     });
   };
 
@@ -42,11 +45,10 @@ function Home({ route, navigation }: PropsHome) {
     }).then(res => {
       if (res.status == 200) {
         setProducts(res.data);
-        console.log(res.data)
       }
     }).catch(err => {
       console.error(err);
-      alert('Deu merda lá');
+      Alert.alert('Erro', 'Não foi possível carregar os dados, por favor tente novamente.');
     });
   };
 
@@ -59,27 +61,45 @@ function Home({ route, navigation }: PropsHome) {
   };
 
   async function handleProductAvailability(id: number, currentAvailability: boolean, price: number) {
+    const user = await SecureStore.getItemAsync('user').catch(err => {
+      Alert.alert('Erro de autenticação!', 'Você não salvou suas credenciais na tela de login ou ao atualizar suas credenciais. Por favor, faça login novamente para completar suas ações!')
+      return;
+    });
+    const password = await SecureStore.getItemAsync('password').catch(err => {
+      Alert.alert('Erro de autenticação!', 'Você não salvou suas credenciais na tela de login ou ao atualizar suas credenciais. Por favor, faça login novamente para completar suas ações!')
+      return;
+    });
+
     const availability = !currentAvailability;
     await api.put(`/product/${id}`, {
       availability: availability,
       price: price
     }, {
       params: {
-        userName: 'Clóvis',
-        password: '88683250'
+        userName: user,
+        password: password
       }
     }).then(response => {
       if (response.status == 200) {
-        alert(`Disponibilidade alterada com sucesso!`);
+        Alert.alert('Sucesso!', `Disponibilidade alterada com sucesso!`);
         loadProducts();
       };
     }).catch(error => {
       console.log(error);
-      alert('Houve algum erro interno')
+      Alert.alert('Erro', 'Houve algum erro interno')
     });
   };
 
   async function deleteProduct(id: number, productName: string) {
+    const user = await SecureStore.getItemAsync('user').catch(err => {
+      Alert.alert('Erro de autenticação!', 'Você não salvou suas credenciais na tela de login ou ao atualizar suas credenciais. Por favor, faça login novamente para completar suas ações!')
+      return;
+    });
+    const password = await SecureStore.getItemAsync('password').catch(err => {
+      Alert.alert('Erro de autenticação!', 'Você não salvou suas credenciais na tela de login ou ao atualizar suas credenciais. Por favor, faça login novamente para completar suas ações!')
+      return;
+    });
+
     Alert.alert(
       'Atenção!',
       `Você deseja realmente deletar o ${productName}?`,
@@ -94,8 +114,8 @@ function Home({ route, navigation }: PropsHome) {
           onPress: async () => {
             await api.delete(`/product/${id}`, {
               params: {
-                userName: 'Clóvis',
-                password: '88683250'
+                userName: user,
+                password: password
               }
             }).then(response => {
               if (response.status == 200) {
@@ -120,6 +140,9 @@ function Home({ route, navigation }: PropsHome) {
 
   useEffect(() => {
     loadProducts();
+    return () => {
+      setProducts([]);
+    }
   }, [selectedValue])
 
   useEffect(() => {
@@ -159,20 +182,40 @@ function Home({ route, navigation }: PropsHome) {
           </Picker>
         </View>
 
-        {products.map((product: IProduct) => {
-          return <ProductCard
-            key={product.id}
-            image={product.imageUrl}
-            title={product.name}
-            description={product.description}
-            avaibility={product.availability}
-            price={`${product.price}`}
-            priceForTwo={`${product.priceForTwo}`}
-            avaibilityFunction={() => handleProductAvailability(product.id, product.availability, product.price)}
-            editFunction={() => handleGoToEditProduct(product.id)}
-            deleteFunction={() => deleteProduct(product.id, product.name)}
-          />
-        })}
+        {!products
+          ?
+          <Spinner />
+          :
+          selectedValue !== 'Porções extras' ?
+            products.map((product: IProduct) => {
+              return <ProductCard
+                key={product.id}
+                image={product.imageUrl}
+                title={product.name}
+                description={product.description}
+                avaibility={product.availability}
+                price={`${product.price}`}
+                priceForTwo={`${product.priceForTwo}`}
+                avaibilityFunction={() => handleProductAvailability(product.id, product.availability, product.price)}
+                editFunction={() => handleGoToEditProduct(product.id)}
+                deleteFunction={() => deleteProduct(product.id, product.name)}
+              />
+            })
+            :
+            products.map((product: IProduct) => {
+              return (
+                <ExtraPortionCard
+                  key={product.id}
+                  price={product.price}
+                  avaibility={product.availability}
+                  avaibilityFunction={() => handleProductAvailability(product.id, product.availability, product.price)}
+                  deleteFunction={() => deleteProduct(product.id, product.name)}
+                  editFunction={() => handleGoToEditProduct(product.id)}
+                  title={product.name}
+                />
+              )
+            })
+        }
       </ScrollView>
     </View>
   );
