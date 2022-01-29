@@ -11,6 +11,7 @@ import api from '../../services/api';
 import { PropsEditProduct } from '../../@types/routes';
 import IProduct from '../../@types/interfaces';
 import * as SecureStore from 'expo-secure-store';
+import Spinner from '../../components/Spinner';
 
 function EditProduct({ route, navigation }: PropsEditProduct) {
   const [productType, setProductType] = useState('');
@@ -20,7 +21,7 @@ function EditProduct({ route, navigation }: PropsEditProduct) {
   const [price, setPrice] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [descriptionLength, setDescrptionLength] = useState<number>(0);
-  const [product, setProduct] = useState<IProduct | undefined>();
+  const [product, setProduct] = useState<IProduct>();
 
   async function loadProduct() {
     await api.get(`/product/${route.params.productId}`).then(res => {
@@ -59,24 +60,31 @@ function EditProduct({ route, navigation }: PropsEditProduct) {
         userName: user,
         password: password
       }
+    }).then(res => {
+      if (res.status == 200) navigation.goBack();
+    }).catch(err => {
+      Alert.alert('Erro', 'Não foi possível atualizar o produto. Por favor tente novamente.')
     });
   }
 
   useEffect(() => {
     loadProduct();
-    setProductType(product?.type ? product.type : 'Entradinhas')
+    //setProductType(`${product?.type}`)
   }, [])
 
   let openImagePickerAsync = async () => {
     let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (permissionResult.granted === false) {
-      alert("Permission to access camera roll is required!");
+      Alert.alert('Atenção!', 'A permissão para acessar a galeria/câmera é necessária para o funcionamento do app!');
       return;
     }
 
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      base64: true
+      base64: true,
+      allowsEditing: true,
+      allowsMultipleSelection: false,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images
     });
 
     if (pickerResult.cancelled) return;
@@ -100,15 +108,14 @@ function EditProduct({ route, navigation }: PropsEditProduct) {
           style: 'cancel'
         }
       ])
+    } else {
+      navigation.goBack()
     };
-    navigation.goBack();
   };
 
   if (!product) {
     return (
-      <View>
-        <Text>Spinner</Text>
-      </View>
+      <Spinner />
     );
   } else {
     return (
@@ -139,14 +146,14 @@ function EditProduct({ route, navigation }: PropsEditProduct) {
             <TextInput style={styles.input} placeholder={product?.name ? product.name : 'Nome do prato'} onChangeText={text => setProductName(text)} />
           </View>
 
-          <View style={styles.inputView}>
+          <View style={[styles.inputView, { display: productType === 'Porções extras' ? 'none' : 'flex'}]}>
             <Text style={styles.label}>Selecione uma imagem</Text>
             <TouchableOpacity style={styles.imageInput} onPress={openImagePickerAsync}>
               {img ? <Image style={styles.imageInput} source={{ uri: 'data:image/jpeg;base64,' + img }} /> : <Image style={styles.imageInput} source={{ uri: product.imageUrl }} />}
             </TouchableOpacity>
           </View>
 
-          <View style={styles.inputView}>
+          <View style={[styles.inputView, { display: productType === 'Porções extras' ? 'none' : 'flex'}]}>
             <Text style={styles.label}>Descrição</Text>
             <TextInput style={styles.multilineInput} multiline onChangeText={text => {
               setDescription(text);
