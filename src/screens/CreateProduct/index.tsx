@@ -1,4 +1,4 @@
-import { Text, TextInput, TouchableOpacity, View, Image } from 'react-native'
+import { Text, TextInput, TouchableOpacity, View, Image, Alert } from 'react-native'
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import Header from '../../components/Header';
@@ -44,12 +44,14 @@ function CreateProduct({ navigation, route }: PropsCreateProduct) {
     let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (permissionResult.granted === false) {
-      alert("Permission to access camera roll is required!");
+      Alert.alert('Atenção!', 'A permissão para acessar a galeria/câmera é necessária para o funcionamento do app!');
       return;
     }
 
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      base64: true
+      base64: true,
+      allowsMultipleSelection: false,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images
     });
 
     if (pickerResult.cancelled) return;
@@ -80,7 +82,7 @@ function CreateProduct({ navigation, route }: PropsCreateProduct) {
           </Picker>
         </View>
 
-        <View style={styles.inputView}>
+        <View style={[styles.inputView, { display: productType === 'Porções extras' ? 'none' : 'flex'}]}>
           <Text style={styles.label}>Selecione uma imagem</Text>
           <TouchableOpacity style={styles.imageInput} onPress={openImagePickerAsync}>
             {img == ''
@@ -102,7 +104,7 @@ function CreateProduct({ navigation, route }: PropsCreateProduct) {
           <TextInput style={styles.input} placeholder='25,00' onChangeText={text => setPrice(text)} />
         </View>
 
-        <View style={styles.inputView}>
+        <View style={[styles.inputView, { display: productType === 'Porções extras' ? 'none' : 'flex'}]}>
           <Text style={styles.label}>Descrição</Text>
           <TextInput style={styles.multilineInput} multiline onChangeText={text => {
             setDescription(text);
