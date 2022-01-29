@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Image, Dimensions } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import styles from './styles';
 import { colors } from '../../styles';
 
@@ -34,7 +34,7 @@ const ProductCard: React.FC<IProductCardProps> = ({
             ?
             <Image style={styles.image} source={{ uri: image }} />
             :
-           <View style={styles.image} />
+            <View style={styles.image} />
           }
         </View>
 
@@ -42,8 +42,37 @@ const ProductCard: React.FC<IProductCardProps> = ({
           <Text style={styles.label}>{title}</Text>
           <Text style={[styles.text, { width: Dimensions.get('window').width / 2 - 10, height: Dimensions.get('window').height / 6.5 }]}>{description}</Text>
           <View style={styles.priceView}>
-            <Text style={[styles.label, styles.price]}>{priceForTwo}</Text>
-            <Text style={[styles.label, styles.price]}>{price}</Text>
+            <Text style={[styles.label, styles.price]}>
+              R$
+              {
+                String(priceForTwo).includes('.')
+                  ?
+                  String(priceForTwo).split('.')[1].length == 2
+                    ?
+                    String(priceForTwo).replace('.', ',')
+                    :
+                    String(priceForTwo).replace('.', ',') + '0'
+                  :
+                  String(priceForTwo) + ',00'}
+              <Ionicons name='people-sharp' size={16} color={colors.secondary[0]} />
+            </Text>
+
+
+            <Text style={[styles.label, styles.price]}>
+              R$
+              {
+                String(price).includes('.')
+                  ?
+                  String(price).split('.')[1].length == 2
+                    ?
+                    String(price).replace('.', ',')
+                    :
+                    String(price).replace('.', ',') + '0'
+                  :
+                  String(price) + ',00'
+              }
+              <Ionicons name='md-person' size={16} color={colors.secondary[0]} />
+            </Text>
           </View>
         </View>
       </View>
@@ -61,7 +90,7 @@ const ProductCard: React.FC<IProductCardProps> = ({
           <FontAwesome name='trash' color={'#F00'} size={22} />
         </TouchableOpacity>
       </View>
-    </View>
+    </View >
   );
 };
 
