@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import Routes from './src/routes';
@@ -31,7 +31,7 @@ export default function App() {
     return (
       <View style={styles.container}>
         <StatusBar style='dark' hidden />
-        <Text>Carregando assets...</Text>
+        <Image style={{ height: Dimensions.get('screen').height, width: Dimensions.get('screen').width }} source={require('./assets/splash.png')}/>
       </View>
     );
   } else {
