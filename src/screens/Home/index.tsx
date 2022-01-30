@@ -60,7 +60,7 @@ function Home({ route, navigation }: PropsHome) {
     navigation.navigate('AccountConfig');
   };
 
-  async function handleProductAvailability(id: number, currentAvailability: boolean, price: number) {
+  async function handleProductAvailability(id: number, currentAvailability: boolean, price: number, priceForTwo: number) {
     const user = await SecureStore.getItemAsync('user').catch(err => {
       Alert.alert('Erro de autenticação!', 'Você não salvou suas credenciais na tela de login ou ao atualizar suas credenciais. Por favor, faça login novamente para completar suas ações!')
       return;
@@ -73,7 +73,8 @@ function Home({ route, navigation }: PropsHome) {
     const availability = !currentAvailability;
     await api.put(`/product/${id}`, {
       availability: availability,
-      price: price
+      price: Number(price),
+      priceForTwo: Number(priceForTwo)
     }, {
       params: {
         userName: user,
@@ -196,7 +197,7 @@ function Home({ route, navigation }: PropsHome) {
                 avaibility={product.availability}
                 price={`${product.price}`}
                 priceForTwo={`${product.priceForTwo}`}
-                avaibilityFunction={() => handleProductAvailability(product.id, product.availability, product.price)}
+                avaibilityFunction={() => handleProductAvailability(product.id, product.availability, Number(String(product.price).replace(',', '.')), Number(String(product.priceForTwo).replace(',', '.')))}
                 editFunction={() => handleGoToEditProduct(product.id)}
                 deleteFunction={() => deleteProduct(product.id, product.name)}
               />
@@ -208,7 +209,7 @@ function Home({ route, navigation }: PropsHome) {
                   key={product.id}
                   price={product.price}
                   avaibility={product.availability}
-                  avaibilityFunction={() => handleProductAvailability(product.id, product.availability, product.price)}
+                  avaibilityFunction={() => handleProductAvailability(product.id, product.availability, Number(String(product.price).replace(',', '.')), Number(String(product.priceForTwo).replace(',', '.')))}
                   deleteFunction={() => deleteProduct(product.id, product.name)}
                   editFunction={() => handleGoToEditProduct(product.id)}
                   title={product.name}

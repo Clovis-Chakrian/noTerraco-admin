@@ -24,6 +24,11 @@ function CreateProduct({ navigation, route }: PropsCreateProduct) {
   };
 
   async function createProduct() {
+    if (description.length > 182) {
+      Alert.alert('Atenção!', 'A descrição não deve ter mais de 182 caracteres.');
+      return;
+    };
+
     const data = {
       name: productName,
       type: productType,
@@ -101,7 +106,7 @@ function CreateProduct({ navigation, route }: PropsCreateProduct) {
 
         <View style={styles.inputView}>
           <Text style={styles.label}>Preço</Text>
-          <TextInput style={styles.input} placeholder='25,00' onChangeText={text => setPrice(text)} />
+          <TextInput style={styles.input} placeholder='25,00' keyboardType='number-pad' onChangeText={text => setPrice(text)} />
         </View>
 
         <View style={[styles.inputView, { display: productType === 'Porções extras' ? 'none' : 'flex'}]}>
@@ -110,7 +115,7 @@ function CreateProduct({ navigation, route }: PropsCreateProduct) {
             setDescription(text);
             setDescrptionLength(text.length);
           }} textAlignVertical='top' placeholder='Pasteis de carne...' />
-          <Text style={[styles.text, { color: descriptionLength > 250 ? '#F00' : colors.secondary[0], alignSelf: 'flex-end' }]}>{descriptionLength}/250</Text>
+          <Text style={[styles.text, { color: descriptionLength > 182 ? '#F00' : colors.secondary[0], alignSelf: 'flex-end' }]}>{descriptionLength}/182</Text>
         </View>
 
         <View style={{ marginVertical: 20 }}>
