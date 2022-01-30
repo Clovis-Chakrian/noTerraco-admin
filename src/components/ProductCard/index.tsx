@@ -43,34 +43,13 @@ const ProductCard: React.FC<IProductCardProps> = ({
           <Text style={[styles.text, { width: Dimensions.get('window').width / 2 - 10, height: Dimensions.get('window').height / 6.5 }]}>{description}</Text>
           <View style={styles.priceView}>
             <Text style={[styles.label, styles.price]}>
-              R$
-              {
-                String(priceForTwo).includes('.')
-                  ?
-                  String(priceForTwo).split('.')[1].length == 2
-                    ?
-                    String(priceForTwo).replace('.', ',')
-                    :
-                    String(priceForTwo).replace('.', ',') + '0'
-                  :
-                  String(priceForTwo) + ',00'}
+              R${priceForTwo}
               <Ionicons name='people-sharp' size={16} color={colors.secondary[0]} />
             </Text>
 
 
             <Text style={[styles.label, styles.price]}>
-              R$
-              {
-                String(price).includes('.')
-                  ?
-                  String(price).split('.')[1].length == 2
-                    ?
-                    String(price).replace('.', ',')
-                    :
-                    String(price).replace('.', ',') + '0'
-                  :
-                  String(price) + ',00'
-              }
+              R${price}
               <Ionicons name='md-person' size={16} color={colors.secondary[0]} />
             </Text>
           </View>

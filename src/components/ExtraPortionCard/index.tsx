@@ -24,16 +24,7 @@ const ExtraPortionCard: React.FC<IExtraPortionCard> = ({
     <View style={styles.container}>
       <View style={styles.textsView}>
         <Text style={styles.label}>{title}</Text>
-        <Text style={[styles.label, { color: colors.secondary[0] }]}>R${
-          String(price).includes('.')
-            ?
-            String(price).split('.')[1].length == 2
-              ?
-              String(price).replace('.', ',')
-              :
-              String(price).replace('.', ',') + '0'
-            :
-            String(price) + ',00'}</Text>
+        <Text style={[styles.label, { color: colors.secondary[0] }]}>R${price}</Text>
       </View>
       <View style={styles.buttonsView}>
         <TouchableOpacity onPress={avaibilityFunction}>
