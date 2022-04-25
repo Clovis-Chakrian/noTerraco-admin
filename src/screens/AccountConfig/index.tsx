@@ -20,13 +20,31 @@ function AccountConfig({ route, navigation }: PropsAccountConfig) {
   const [confirmPassword, setConfirmPassword] = useState<string>()
 
   async function getAdminData() {
+    const name = await SecureStore.getItemAsync('user');
+    const password = await SecureStore.getItemAsync('password');
+
+    await api.get('/login', {
+      params: {
+        userName: name,
+        password: password
+      }
+    }).then(response => {
+      if (response.status == 200) setAdmin(response.data);
+    }).catch(err => {
+      console.error(err);
+      alert('Deu ruim na request')
+    });
+  }
+
+  /*
+  async function getAdminData() {
     await api.get('/admin/1').then(response => {
       if (response.status == 200) setAdmin(response.data);
     }).catch(err => {
       console.error(err);
       alert('Deu ruim na request')
     });
-  };
+  };*/
 
   async function updateAccount() {
     if (!newPassword) {
@@ -42,7 +60,7 @@ function AccountConfig({ route, navigation }: PropsAccountConfig) {
       newName
     };
 
-    await api.put('admin/1', data, {
+    await api.put(`admin/${admin?.id}`, data, {
       params: {
         oldPassword
       }

@@ -17,7 +17,7 @@ import ExtraPortionCard from '../../components/ExtraPortionCard';
 function Home({ route, navigation }: PropsHome) {
   const [search, setSearch] = useState<string>();
   const [selectedValue, setSelectedValue] = useState<string>('Entradinhas');
-  const pickerValues = ['Entradinhas', 'Saladas, vegetarianos & veganos', 'Principais', 'Bebidas', 'Sobremesas', 'Porções extras'];
+  const pickerValues = ['Entradinhas', 'Saladas, vegetarianos & veganos', 'Principais', 'Bebidas', 'Sobremesas', 'Porções extras', 'Pet'];
   const [products, setProducts] = useState([]);
 
   async function loadProducts() {

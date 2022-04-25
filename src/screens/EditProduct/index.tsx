@@ -15,12 +15,19 @@ import Spinner from '../../components/Spinner';
 
 function EditProduct({ route, navigation }: PropsEditProduct) {
   const [productType, setProductType] = useState('');
+  const [productSubtype, setProductSubtype] = useState('');
   const [img, setSelectedImg] = useState<string | undefined>('');
-  const pickerValues = ['Entradinhas', 'Saladas, vegetarianos & veganos', 'Principais', 'Bebidas', 'Sobremesas', 'Porções extras'];
+  const pickerValues = ['Entradinhas', 'Saladas, vegetarianos & veganos', 'Principais', 'Bebidas', 'Sobremesas', 'Porções extras', 'Pet'];
+  const subtypes = {
+    drinks: ['Com álcool', 'Sem álcool'],
+    salads: ['Saladas', 'Vegetarianos', 'Veganos']
+  };
   const [productName, setProductName] = useState<string>('');
   const [price, setPrice] = useState<string>('');
   const [description, setDescription] = useState<string>('');
+  const [memory, setMemory] = useState<string>('');
   const [descriptionLength, setDescrptionLength] = useState<number>(0);
+  const [memoryLength, setMemoryLength] = useState<number>(0);
   const [product, setProduct] = useState<IProduct>();
 
   async function loadProduct() {
@@ -44,15 +51,17 @@ function EditProduct({ route, navigation }: PropsEditProduct) {
       return;
     });
 
-    if (description.length > 182) {
-      Alert.alert('Atenção!', 'A descrição não deve ter mais de 182 caracteres.');
+    if (description.length > 182 || memoryLength > 180) {
+      Alert.alert('Atenção!', 'Você está ultrapassando os limites de caracteres.');
       return;
     };
 
     const data = {
       name: productName,
       type: productType,
+      subtype: productSubtype,
       description: description,
+      memory: memory,
       image: img,
       price: Number(price),
       availability: product?.availability
@@ -134,7 +143,8 @@ function EditProduct({ route, navigation }: PropsEditProduct) {
         <ScrollView style={[styles.container]} contentContainerStyle={{ alignItems: 'center' }}>
           <View style={styles.picker}>
             <Picker
-              selectedValue={productType}
+            
+              selectedValue={productType ? productType : product?.type}
               onValueChange={(itemValue, itemIndex) => {
                 setProductType(itemValue);
               }}
@@ -146,25 +156,54 @@ function EditProduct({ route, navigation }: PropsEditProduct) {
             </Picker>
           </View>
 
+          <View style={[styles.picker, { display: productType === 'Bebidas' || productType === 'Saladas, vegetarianos & veganos' || product?.type === 'Bebidas' || product?.type === 'Saladas, vegetarianos & veganos' ? 'flex' : 'none' }]}>
+            <Picker
+              selectedValue={productSubtype ? productSubtype : product?.subtype}
+              onValueChange={(itemValue, itemIndex) => {
+                setProductSubtype(itemValue);
+              }}
+              dropdownIconColor={colors.primary[1]}
+            >
+              {productType === 'Bebidas' ?
+                subtypes.drinks.map(value => {
+                  return <Picker.Item key={value} style={styles.pickerItem} fontFamily={fonts.fontFamilyBold} label={value} value={value} />
+                })
+                :
+                subtypes.salads.map(value => {
+                  return <Picker.Item key={value} style={styles.pickerItem} fontFamily={fonts.fontFamilyBold} label={value} value={value} />
+                })
+              }
+            </Picker>
+          </View>
+
           <View style={styles.inputView}>
             <Text style={styles.label} >Nome do prato</Text>
             <TextInput style={styles.input} placeholder={product?.name ? product.name : 'Nome do prato'} onChangeText={text => setProductName(text)} />
           </View>
 
-          <View style={[styles.inputView, { display: productType === 'Porções extras' ? 'none' : 'flex'}]}>
+          <View style={[styles.inputView, { display: productType === 'Porções extras' ? 'none' : 'flex' }]}>
             <Text style={styles.label}>Selecione uma imagem</Text>
             <TouchableOpacity style={styles.imageInput} onPress={openImagePickerAsync}>
               {img ? <Image style={styles.imageInput} source={{ uri: 'data:image/jpeg;base64,' + img }} /> : <Image style={styles.imageInput} source={{ uri: product.imageUrl }} />}
             </TouchableOpacity>
           </View>
 
-          <View style={[styles.inputView, { display: productType === 'Porções extras' ? 'none' : 'flex'}]}>
+          <View style={[styles.inputView, { display: productType === 'Porções extras' ? 'none' : 'flex' }]}>
             <Text style={styles.label}>Descrição</Text>
             <TextInput style={styles.multilineInput} multiline onChangeText={text => {
               setDescription(text);
               setDescrptionLength(text.length);
             }} textAlignVertical='top' placeholder={product?.description ? product.description : 'Pasteis de carne...'} />
             <Text style={[styles.text, { color: descriptionLength > 182 ? '#F00' : colors.secondary[0], alignSelf: 'flex-end' }]}>{descriptionLength}/182</Text>
+          </View>
+
+          <View style={[styles.inputView, { display: productType === 'Porções extras' ? 'none' : 'flex' }]}>
+            <Text style={styles.label}>Descrição do nome do prato</Text>
+            <TextInput style={styles.multilineInput} multiline onChangeText={text => {
+              setMemory(text);
+              setMemoryLength(text.length);
+            }} textAlignVertical='top' placeholder={product?.memory ? product.memory : 'Me inspirei...'} />
+            <Text style={[styles.text, { color: memoryLength > 180 ? '#F00' : colors.secondary[0], alignSelf: 'flex-end' }]}>{memoryLength}/180</Text>
           </View>
 
           <View style={styles.inputView}>
