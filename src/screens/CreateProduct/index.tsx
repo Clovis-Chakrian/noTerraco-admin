@@ -14,9 +14,9 @@ function CreateProduct({ navigation, route }: PropsCreateProduct) {
   const [productType, setProductType] = useState('Entradinhas');
   const [productSubtype, setProductSubtype] = useState('Saladas');
   const [img, setSelectedImg] = useState<string | undefined>('');
-  const pickerValues = ['Entradinhas', 'Saladas, vegetarianos & veganos', 'Principais', 'Bebidas', 'Sobremesas', 'Porções extras', 'Pet'];
+  const pickerValues = ['Entradinhas', 'Saladas, vegetarianos & veganos', 'Principais', 'Bebidas', 'Sobremesas', 'Porções extras', 'Pets'];
   const subtypes = {
-    drinks: ['Com álcool', 'Sem álcool'],
+    drinks: ['Sem álcool', 'Cervejas', 'Whiskies', 'Outras bebidas'],
     salads: ['Saladas', 'Vegetarianos', 'Veganos']
   };
   const [productName, setProductName] = useState<string>('');
@@ -66,6 +66,7 @@ function CreateProduct({ navigation, route }: PropsCreateProduct) {
       base64: true,
       allowsMultipleSelection: false,
       allowsEditing: true,
+      aspect: [245, 245],
       mediaTypes: ImagePicker.MediaTypeOptions.Images
     });
 
@@ -117,7 +118,7 @@ function CreateProduct({ navigation, route }: PropsCreateProduct) {
           </Picker>
         </View>
 
-        <View style={[styles.inputView, { display: productType === 'Porções extras' ? 'none' : 'flex' }]}>
+        <View style={[styles.inputView, { display: productType === 'Porções extras' || productType === 'Pets' ? 'none' : 'flex' }]}>
           <Text style={styles.label}>Selecione uma imagem</Text>
           <TouchableOpacity style={styles.imageInput} onPress={openImagePickerAsync}>
             {img == ''
@@ -148,7 +149,7 @@ function CreateProduct({ navigation, route }: PropsCreateProduct) {
           <Text style={[styles.text, { color: descriptionLength > 182 ? '#F00' : colors.secondary[0], alignSelf: 'flex-end' }]}>{descriptionLength}/182</Text>
         </View>
 
-        <View style={[styles.inputView, { display: productType === 'Porções extras' ? 'none' : 'flex' }]}>
+        <View style={[styles.inputView, { display: productType === 'Porções extras' || productType === 'Pets' ? 'none' : 'flex' }]}>
           <Text style={styles.label}>Descrição do nome do prato</Text>
           <TextInput style={styles.multilineInput} multiline onChangeText={text => {
             setMemory(text);

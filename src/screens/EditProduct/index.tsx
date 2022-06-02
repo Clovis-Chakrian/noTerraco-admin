@@ -17,9 +17,9 @@ function EditProduct({ route, navigation }: PropsEditProduct) {
   const [productType, setProductType] = useState('');
   const [productSubtype, setProductSubtype] = useState('');
   const [img, setSelectedImg] = useState<string | undefined>('');
-  const pickerValues = ['Entradinhas', 'Saladas, vegetarianos & veganos', 'Principais', 'Bebidas', 'Sobremesas', 'Porções extras', 'Pet'];
+  const pickerValues = ['Entradinhas', 'Saladas, vegetarianos & veganos', 'Principais', 'Bebidas', 'Sobremesas', 'Porções extras', 'Pets'];
   const subtypes = {
-    drinks: ['Com álcool', 'Sem álcool'],
+    drinks: ['Sem álcool', 'Cervejas', 'Whiskies', 'Outras bebidas'],
     salads: ['Saladas', 'Vegetarianos', 'Veganos']
   };
   const [productName, setProductName] = useState<string>('');
@@ -98,6 +98,7 @@ function EditProduct({ route, navigation }: PropsEditProduct) {
       base64: true,
       allowsEditing: true,
       allowsMultipleSelection: false,
+      aspect: [245, 245],
       mediaTypes: ImagePicker.MediaTypeOptions.Images
     });
 
