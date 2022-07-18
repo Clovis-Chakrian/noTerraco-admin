@@ -161,14 +161,14 @@ function Home({ route, navigation }: PropsHome) {
         rightButtonFunction={handleNavigateToCreateProduct}
       />
       <ScrollView style={[styles.container, { flex: 1, height: Dimensions.get('window').height * 3 }]} contentContainerStyle={{ alignItems: 'center' }}>
-        <View style={styles.searchView}>
+        {/*<View style={styles.searchView}>
           <TextInput style={[styles.input, styles.searchInput]} onChangeText={text => setSearch(text)} />
           <View style={styles.searchButtonView}>
             <TouchableOpacity onPress={searchProduct}>
               <FontAwesome name='search' size={28} color={colors.primary[1]} />
             </TouchableOpacity>
           </View>
-        </View>
+        </View>*/}
         <View style={styles.picker}>
           <Picker
             selectedValue={selectedValue}

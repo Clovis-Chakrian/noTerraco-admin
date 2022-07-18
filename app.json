@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "noTerraco-admin",
-    "slug": "noTerraco-admin",
-    "version": "1.0.0",
+    "name": "No Terraço Admin",
+    "slug": "No_Terraco_Admin",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
