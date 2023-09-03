@@ -1,34 +1,37 @@
 import { useState } from 'react';
-import { Alert, ScrollView, KeyboardAvoidingView } from 'react-native';
+import { View, Alert, ScrollView, KeyboardAvoidingView } from 'react-native';
 import AppButton from '../../AppButton';
+import HalfInput from '../../Inputs/HalfInput';
 import ImageInput from '../../Inputs/ImageInput';
 import Input from '../../Inputs/Input';
 import MultilineInput from '../../Inputs/MultilineInput';
 import styles from './styles';
 import * as ImagePicker from 'expo-image-picker';
-import { IDisheForm } from '../../../@types';
+import { IMainDisheForm } from '../../../@types/components';
 import api from '../../../services/api';
-import { AxiosError } from 'axios';
 import { useNavigation } from '@react-navigation/native';
+import { AxiosError } from 'axios';
 import Spinner from '../../Spinner';
 import socket from '../../../services/socket';
 
-const DisheForm: React.FC<IDisheForm> = ({
+const MainDisheForm: React.FC<IMainDisheForm> = ({
   type,
+  subtype,
   currentDescription,
   currentName,
   currentPrice,
-  edit,
-  subtype,
+  currentPriceForTwo,
   currentImageUrl,
-  selectedProductId
+  selectedProductId,
+  edit
 }) => {
   const [selectedImg, setSelectedImg] = useState<ImagePicker.ImagePickerAsset>();
   const [name, setName] = useState(currentName);
   const [description, setDescription] = useState(currentDescription);
   const [price, setPrice] = useState(currentPrice);
-  const [isLoading, setIsLoading] = useState(false)
-  const navigation = useNavigation()
+  const [priceForTwo, setPriceForTwo] = useState(currentPriceForTwo);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigation();
 
   async function handleCreateProduct() {
     setIsLoading(true);
@@ -39,12 +42,11 @@ const DisheForm: React.FC<IDisheForm> = ({
       type: 'image/*'
     } as any);
     data.append('name', name ? name : '');
-    data.append('description', description ? description : '');
+    data.append('description', description ? description : '')
     data.append('type', type);
-    if (subtype !== '' && subtype !== null && subtype !== undefined) {
-      data.append('subtype', subtype);
-    };
+    data.append('subtype', subtype);
     data.append('price', price ? price : '');
+    data.append('priceForTwo', priceForTwo ? priceForTwo : String((Number(price) * 0.7 + Number(price)).toFixed(2)));
 
     await api.post('/product', data, {
       headers: {
@@ -68,13 +70,13 @@ const DisheForm: React.FC<IDisheForm> = ({
       Alert.alert(`Erro - ${err.status}`, errorMessage.message ? errorMessage.message : 'Houve um erro na aplicação. Tente novamente mais tarde.')
       setIsLoading(false);
       navigation.goBack();
-    })
+    });
+
   }
 
   async function handleEditProduct() {
     setIsLoading(true);
     const data = new FormData();
-
     if (selectedImg?.uri) {
       data.append('image', {
         name: `${Date.now()}`,
@@ -82,12 +84,11 @@ const DisheForm: React.FC<IDisheForm> = ({
         type: 'image/jpeg'
       } as any);
       data.append('name', name ? name : '');
-      data.append('description', description ? description : '');
+      data.append('description', description ? description : '')
       data.append('type', type);
-      if (subtype !== '' && subtype !== null && subtype !== undefined) {
-        data.append('subtype', subtype);
-      };
-      data.append('price', price ? price.replace(',', '.') : '');
+      data.append('subtype', subtype);
+      data.append('price', price ? price : '');
+      data.append('priceForTwo', priceForTwo ? priceForTwo : String((Number(price) * 0.7 + Number(price)).toFixed(2)));
 
       await api.patch(`/product/${selectedProductId}`, data, {
         headers: {
@@ -106,20 +107,9 @@ const DisheForm: React.FC<IDisheForm> = ({
           navigation.goBack();
         }
       }).catch((err: AxiosError) => {
-        console.log({
-          err,
-          code: err.code,
-          resp: err.response,
-          req: err.request,
-          cause: err.cause,
-          errName: err.name,
-          message: err.message,
-          status: err.status,
-          config: err.config,
-          stack: err.stack
-        });
+        console.log(err);
         const errorMessage = err.response?.data as { message: string }
-        Alert.alert(`Erro - ${err.status}`, errorMessage ? `${errorMessage}` : 'Houve um erro na aplicação. Tente novamente mais tarde.')
+        Alert.alert(`Erro - ${err.status}`, errorMessage.message ? errorMessage.message : 'Houve um erro na aplicação. Tente novamente mais tarde.')
         setIsLoading(false);
         navigation.goBack();
       });
@@ -128,12 +118,11 @@ const DisheForm: React.FC<IDisheForm> = ({
     };
 
     data.append('name', name ? name : '');
-    data.append('description', description ? description : '');
+    data.append('description', description ? description : '')
     data.append('type', type);
-    if (subtype !== '' && subtype !== null && subtype !== undefined) {
-      data.append('subtype', subtype);
-    };
+    data.append('subtype', subtype);
     data.append('price', price ? price.replace(',', '.') : '');
+    data.append('priceForTwo', priceForTwo ? priceForTwo.replace(',', '.') : String((Number(price?.replace(',', '.')) * 0.7 + Number(price?.replace(',', '.'))).toFixed(2)));
 
     await api.patch(`/product/${selectedProductId}`, data, {
       headers: {
@@ -157,7 +146,7 @@ const DisheForm: React.FC<IDisheForm> = ({
       Alert.alert(`Erro - ${err.status}`, errorMessage.message ? errorMessage.message : 'Houve um erro na aplicação. Tente novamente mais tarde.')
       setIsLoading(false);
       navigation.goBack();
-    });
+    })
   };
 
   let openImagePickerAsync = async () => {
@@ -214,14 +203,25 @@ const DisheForm: React.FC<IDisheForm> = ({
           initialValue={currentDescription}
         />
 
-        <Input
-          label='Preço'
-          onChangeText={(text) => {
-            setPrice(text)
-          }}
-          placeholder='O preço dele aqui'
-          initialValue={currentPrice}
-        />
+        <View style={styles.pricesView}>
+          <HalfInput
+            label='Preço p/ 1'
+            onChangeText={(text) => {
+              setPrice(text)
+            }}
+            placeholder="Valor do preço para 1"
+            initialValue={price}
+          />
+
+          <HalfInput
+            label='Preço p/ 2'
+            onChangeText={(text) => {
+              setPriceForTwo(text)
+            }}
+            placeholder={price ? String(Number(Number(price.replace(',', '.')) * 0.7 + Number(price.replace(',', '.'))).toFixed(2)) : ''}
+            initialValue={priceForTwo}
+          />
+        </View>
 
         <AppButton
           buttonText={edit ? 'Atualizar' : 'Criar'}
@@ -232,4 +232,4 @@ const DisheForm: React.FC<IDisheForm> = ({
   );
 }
 
-export default DisheForm;
+export default MainDisheForm;

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://192.168.0.49'
+  baseURL: 'https://noterracorestaurante.herokuapp.com'
 });
 
 export default api;

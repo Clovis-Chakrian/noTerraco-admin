@@ -1,12 +1,19 @@
 import fonts from "./fonts";
 import colors from './colors'
-import { Dimensions } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 
-const general = {
+const general = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primary[0],
+    backgroundColor: '#F4F4F4',
     paddingTop: 10,
+  },
+
+  scrollViewContainer: {
+    paddingTop: 10,
+    paddingBottom: 100,
+    alignItems: 'center',
+    width: Dimensions.get('window').width
   },
 
   label: {
@@ -20,16 +27,6 @@ const general = {
     fontFamily: fonts.fontFamilyBold,
     fontSize: fonts.fontSize.title,
     color: colors.text[0]
-  },
-
-  input: {
-    width: Dimensions.get('screen').width - 40,
-    height: 65,
-    borderRadius: 10,
-    backgroundColor: colors.secondary[1],
-    color: colors.text[0],
-    fontFamily: fonts.fontFamily,
-    paddingHorizontal: 10
   },
 
   text: {
@@ -59,18 +56,21 @@ const general = {
     width: Dimensions.get('screen').width - 40,
     height: Dimensions.get('screen').width - 40,
     borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primary[0],
   },
 
   multilineInput: {
     width: Dimensions.get('screen').width - 40,
     height: 180,
     borderRadius: 10,
-    backgroundColor: colors.secondary[1],
+    backgroundColor: colors.primary[0],
     color: colors.text[0],
     fontFamily: fonts.fontFamily,
     paddingHorizontal: 10,
-    paddingVertical: 10
+    paddingVertical: 10,
   },
-};
+});
 
 export default general;

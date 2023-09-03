@@ -2,9 +2,14 @@
   "expo": {
     "name": "No Terraço Admin",
     "slug": "No_Terraco_Admin",
-    "version": "1.0.1",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "plugins": [
+      [
+        "expo-document-picker"
+      ]
+    ],
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -24,7 +29,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.clovischakrian.No_Terraco_Admin"
+      "package": "com.noterracorestaurante.no_terraco_admin"
     },
     "web": {
       "favicon": "./assets/favicon.png"

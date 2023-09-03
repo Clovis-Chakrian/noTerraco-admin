@@ -1,7 +1,12 @@
 import {
   IDisheCard,
   IExtraPortionCard,
-  IMainDisheCard
+  IMainDisheCard,
+  IPicker,
+  IDisheForm,
+  IInput,
+  IImageInput,
+  IFile
 } from './components';
 
 import {
@@ -12,5 +17,9 @@ export {
   IDisheCard,
   IExtraPortionCard,
   IMainDisheCard,
-  IP
+  IDisheForm,
+  IInput,
+  IImageInput,
+  IFile,
+  IProduct
 };

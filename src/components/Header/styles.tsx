@@ -5,7 +5,7 @@ const styles = StyleSheet.create({
   ...general,
   container: {
     width: Dimensions.get('screen').width,
-    height: 100,
+    height: 80,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     elevation: 5,
@@ -17,8 +17,8 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    height: 100,
-    width: 100,
+    height: 80,
+    width: 80,
   }
 });
 

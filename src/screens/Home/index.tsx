@@ -1,34 +1,37 @@
 import { ScrollView, View, Text, TextInput, Dimensions, Alert } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import Header from '../../components/Header';
-import ProductCard from '../../components/ProductCard';
 import { FontAwesome } from '@expo/vector-icons';
-import { colors, fonts } from '../../styles';
+import { colors } from '../../styles';
 import styles from './styles';
-import { useEffect, useState } from 'react';
-import IProduct from '../../@types/interfaces';
+import { Picker } from '../../components';
+import { useEffect, useState, useCallback } from 'react';
+import { IProduct } from '../../@types';
 import api from '../../services/api';
 import { PropsHome } from '../../@types/routes';
 import * as SecureStore from 'expo-secure-store';
 import Spinner from '../../components/Spinner';
-import ExtraPortionCard from '../../components/ExtraPortionCard';
+import { useFocusEffect } from '@react-navigation/native';
+import {
+  WineCard,
+  DisheCard,
+  ExtraPortionCard,
+  MainDisheCard
+} from '../../components/ProductCard';
+import socket from '../../services/socket';
 
 function Home({ route, navigation }: PropsHome) {
-  const [search, setSearch] = useState<string>();
-  const [selectedValue, setSelectedValue] = useState<string>('Entradinhas');
-  const pickerValues = ['Entradinhas', 'Saladas, vegetarianos & veganos', 'Principais', 'Bebidas', 'Sobremesas', 'Porções extras', 'Pets'];
-  const [products, setProducts] = useState([]);
+  const [search, setSearch] = useState('');
+  const [filteredProducts, setFilteredProducts] = useState<IProduct[]>([]);
+  const [selectedType, setSelectedType] = useState<string>('Entradinhas');
+  const pickerValues = ['Entradinhas', 'Saladas, vegetarianos & veganos', 'Principais', 'Bebidas', 'Sobremesas', 'Porções extras', 'Pets', 'Vinhos'];
+  const [products, setProducts] = useState<IProduct[]>([]);
 
   async function loadProducts() {
-    await api.get('/products', {
-      params: {
-        type: selectedValue,
-        name: ''
-      }
-    }).then(res => {
+    await api.get('/products').then(res => {
       if (res.status == 200) {
+        const products: IProduct[] = res.data;
         setProducts(res.data);
+        setFilteredProducts(products.filter(product => product.type.includes(selectedType)));
       }
     }).catch(err => {
       console.error(err);
@@ -36,53 +39,26 @@ function Home({ route, navigation }: PropsHome) {
     });
   };
 
-  async function searchProduct() {
-    await api.get('/products', {
-      params: {
-        type: selectedValue,
-        name: search
-      }
-    }).then(res => {
-      if (res.status == 200) {
-        setProducts(res.data);
-      }
-    }).catch(err => {
-      console.error(err);
-      Alert.alert('Erro', 'Não foi possível carregar os dados, por favor tente novamente.');
-    });
+  function handleSearchProducts() {
+    if (search) {
+      setFilteredProducts(products.filter(product => product.name.includes(search) && product.type.includes(selectedType)))
+    } else {
+      setFilteredProducts(products.filter(product => product.type.includes(selectedType)))
+    }
   };
 
-  function handleNavigateToCreateProduct() {
-    navigation.navigate('CreateProduct');
-  };
+  // function handleGoToAccountConfig() {
+  //   navigation.navigate('AccountConfig');
+  // };
 
-  function handleGoToAccountConfig() {
-    navigation.navigate('AccountConfig');
-  };
-
-  async function handleProductAvailability(id: number, currentAvailability: boolean, price: number, priceForTwo: number) {
-    const user = await SecureStore.getItemAsync('user').catch(err => {
-      Alert.alert('Erro de autenticação!', 'Você não salvou suas credenciais na tela de login ou ao atualizar suas credenciais. Por favor, faça login novamente para completar suas ações!')
-      return;
-    });
-    const password = await SecureStore.getItemAsync('password').catch(err => {
-      Alert.alert('Erro de autenticação!', 'Você não salvou suas credenciais na tela de login ou ao atualizar suas credenciais. Por favor, faça login novamente para completar suas ações!')
-      return;
-    });
-
+  async function handleProductAvailability(id: string, currentAvailability: boolean) {
     const availability = !currentAvailability;
-    await api.put(`/product/${id}`, {
-      availability: availability,
-      price: Number(price),
-      priceForTwo: Number(priceForTwo)
-    }, {
-      params: {
-        userName: user,
-        password: password
-      }
+    await api.patch(`/product/${id}`, {
+      availability
     }).then(response => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         Alert.alert('Sucesso!', `Disponibilidade alterada com sucesso!`);
+        socket.emit('hasUpdated');
         loadProducts();
       };
     }).catch(error => {
@@ -91,16 +67,7 @@ function Home({ route, navigation }: PropsHome) {
     });
   };
 
-  async function deleteProduct(id: number, productName: string) {
-    const user = await SecureStore.getItemAsync('user').catch(err => {
-      Alert.alert('Erro de autenticação!', 'Você não salvou suas credenciais na tela de login ou ao atualizar suas credenciais. Por favor, faça login novamente para completar suas ações!')
-      return;
-    });
-    const password = await SecureStore.getItemAsync('password').catch(err => {
-      Alert.alert('Erro de autenticação!', 'Você não salvou suas credenciais na tela de login ou ao atualizar suas credenciais. Por favor, faça login novamente para completar suas ações!')
-      return;
-    });
-
+  async function deleteProduct(id: string, productName: string) {
     Alert.alert(
       'Atenção!',
       `Você deseja realmente deletar o ${productName}?`,
@@ -113,14 +80,10 @@ function Home({ route, navigation }: PropsHome) {
         {
           text: "Sim",
           onPress: async () => {
-            await api.delete(`/product/${id}`, {
-              params: {
-                userName: user,
-                password: password
-              }
-            }).then(response => {
+            await api.delete(`/product/${id}`).then(response => {
               if (response.status == 200) {
                 Alert.alert('Sucesso!', `${productName} deletado com sucesso!`);
+                socket.emit('hasUpdated');
                 loadProducts();
               };
             }).catch(error => {
@@ -133,18 +96,85 @@ function Home({ route, navigation }: PropsHome) {
     );
   };
 
-  function handleGoToEditProduct(productId: number) {
+  function handleGoToEditProduct(productId: string) {
     navigation.navigate('EditProduct', {
       productId
     });
   };
 
+  function handleShowProducts(type: string) {
+    return filteredProducts.map((product: IProduct) => {
+      switch (type) {
+        case 'Principais':
+          return <MainDisheCard
+            key={product.id}
+            subtype={product.subtype || ''}
+            type={product.type}
+            imageUrl={product.imageUrl}
+            name={product.name}
+            description={product?.description || ''}
+            avaibility={product.availability}
+            price={`${product.price}`}
+            priceForTwo={`${product.priceForTwo}`}
+            avaibilityFunction={() => handleProductAvailability(product.id, product.availability)}
+            editFunction={() => handleGoToEditProduct(product.id)}
+            deleteFunction={() => deleteProduct(product.id, product.name)}
+          />
+
+        case 'Porções extras':
+          return <ExtraPortionCard
+            type={product.type}
+            key={product.id}
+            name={product.name}
+            avaibility={product.availability}
+            price={`${product.price}`}
+            avaibilityFunction={() => handleProductAvailability(product.id, product.availability)}
+            editFunction={() => handleGoToEditProduct(product.id)}
+            deleteFunction={() => deleteProduct(product.id, product.name)}
+          />
+
+        case 'Vinhos':
+          return <WineCard
+            key={product.id}
+            imageUrl={product.imageUrl}
+            name={product.name}
+            subtype={product.subtype || ''}
+            type={product.type}
+            avaibility={product.availability}
+            price={`${product.price}`}
+            priceForTwo={`${product.priceForTwo}`}
+            avaibilityFunction={() => handleProductAvailability(product.id, product.availability)}
+            editFunction={() => handleGoToEditProduct(product.id)}
+            deleteFunction={() => deleteProduct(product.id, product.name)}
+          />
+
+        default:
+          return <DisheCard
+            key={product.id}
+            imageUrl={product.imageUrl}
+            type={product.type}
+            name={product.name}
+            description={product?.description || ''}
+            avaibility={product.availability}
+            price={`${product.price}`}
+            avaibilityFunction={() => handleProductAvailability(product.id, product.availability)}
+            editFunction={() => handleGoToEditProduct(product.id)}
+            deleteFunction={() => deleteProduct(product.id, product.name)}
+          />
+      }
+    })
+  }
+
   useEffect(() => {
-    loadProducts();
-    return () => {
-      setProducts([]);
-    }
-  }, [selectedValue])
+    handleSearchProducts();
+  }, [search, selectedType])
+
+  useFocusEffect(
+    useCallback(() => {
+      loadProducts();
+      setSelectedType(selectedType);
+    }, [])
+  );
 
   useEffect(() => {
     navigation.addListener('beforeRemove', event => {
@@ -153,72 +183,26 @@ function Home({ route, navigation }: PropsHome) {
   }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.primary[0] }}>
-      <Header
-        displayRightIcon
-        homeScreen
-        leftButtonFunction={handleGoToAccountConfig}
-        rightButtonFunction={handleNavigateToCreateProduct}
-      />
-      <ScrollView style={[styles.container, { flex: 1, height: Dimensions.get('window').height * 3 }]} contentContainerStyle={{ alignItems: 'center' }}>
-        {/*<View style={styles.searchView}>
-          <TextInput style={[styles.input, styles.searchInput]} onChangeText={text => setSearch(text)} />
-          <View style={styles.searchButtonView}>
-            <TouchableOpacity onPress={searchProduct}>
-              <FontAwesome name='search' size={28} color={colors.primary[1]} />
-            </TouchableOpacity>
-          </View>
-        </View>*/}
-        <View style={styles.picker}>
-          <Picker
-            selectedValue={selectedValue}
-            onValueChange={(itemValue, itemIndex) => {
-              setSelectedValue(itemValue);
-            }}
-            dropdownIconColor={colors.primary[1]}
-          >
-            {pickerValues.map(value => {
-              return <Picker.Item key={value} style={styles.pickerItem} fontFamily={fonts.fontFamilyBold} label={value} value={value} />
-            })}
-          </Picker>
+    <ScrollView contentContainerStyle={{ alignItems: 'center' }} style={styles.container}>
+      <View style={styles.searchView}>
+        <TextInput style={styles.searchInput} placeholder="Digite o nome de um prato aqui..." onChangeText={text => setSearch(text)} />
+        <View style={styles.searchButtonView}>
+          <TouchableOpacity>
+            <FontAwesome name='search' size={28} color={colors.primary[1]} />
+          </TouchableOpacity>
         </View>
+      </View>
 
-        {!products
-          ?
-          <Spinner />
-          :
-          selectedValue !== 'Porções extras' ?
-            products.map((product: IProduct) => {
-              return <ProductCard
-                key={product.id}
-                image={product.imageUrl}
-                title={product.name}
-                description={product.description}
-                avaibility={product.availability}
-                price={`${product.price}`}
-                priceForTwo={`${product.priceForTwo}`}
-                avaibilityFunction={() => handleProductAvailability(product.id, product.availability, Number(String(product.price).replace(',', '.')), Number(String(product.priceForTwo).replace(',', '.')))}
-                editFunction={() => handleGoToEditProduct(product.id)}
-                deleteFunction={() => deleteProduct(product.id, product.name)}
-              />
-            })
-            :
-            products.map((product: IProduct) => {
-              return (
-                <ExtraPortionCard
-                  key={product.id}
-                  price={product.price}
-                  avaibility={product.availability}
-                  avaibilityFunction={() => handleProductAvailability(product.id, product.availability, Number(String(product.price).replace(',', '.')), Number(String(product.priceForTwo).replace(',', '.')))}
-                  deleteFunction={() => deleteProduct(product.id, product.name)}
-                  editFunction={() => handleGoToEditProduct(product.id)}
-                  title={product.name}
-                />
-              )
-            })
-        }
-      </ScrollView>
-    </View>
+      <Picker
+        onSelectOption={option => setSelectedType(option)}
+        options={pickerValues}
+        selectedOption={selectedType}
+      />
+
+      {
+        handleShowProducts(selectedType)
+      }
+    </ScrollView>
   );
 };
 

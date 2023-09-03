@@ -1,5 +1,5 @@
 import { Dimensions, StyleSheet } from "react-native";
-import { colors, general } from "../../styles";
+import { colors, general } from "../../../styles";
 
 const styles = StyleSheet.create({
   ...general,
@@ -34,7 +34,8 @@ const styles = StyleSheet.create({
 
   priceView: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    width: 200,
   },
 
   price: {

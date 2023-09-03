@@ -38,16 +38,17 @@ export default function App() {
     return (
       <>
         <StatusBar style='dark' hidden />
-        <Routes initialRoute={hasSaveCredentials ? 'Home' : 'Login'} />
+        <Routes initialRoute={'Home'} />
       </>
     );
   };
 }
 
+//hasSaveCredentials ? 'Home' : 'Login'
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },

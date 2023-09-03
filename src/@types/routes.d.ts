@@ -1,11 +1,11 @@
 import { StackScreenProps } from '@react-navigation/stack'
 
-type StackParamList = {
+export type StackParamList = {
   Login: undefined,
   Home: undefined,
   CreateProduct: undefined,
   AccountConfig: undefined,
-  EditProduct: { productId: number }
+  EditProduct: { productId: string }
 };
 
 export type PropsLogin = StackScreenProps<StackParamList, 'Login'>
