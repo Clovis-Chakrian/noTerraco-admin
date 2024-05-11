@@ -79,6 +79,7 @@ function EditProduct({ route, navigation }: PropsEditProduct) {
           currentImageUrl={product.imageUrl}
           edit={route.params.productId !== null}
           subtype={product.subtype}
+          selectedProductId={route.params.productId}
         />
     }
   };

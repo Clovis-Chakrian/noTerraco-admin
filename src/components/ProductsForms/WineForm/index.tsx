@@ -42,8 +42,8 @@ const WineDisheForm: React.FC<IMainDisheForm> = ({
     data.append('name', name ? name : '');
     data.append('type', type);
     data.append('subtype', subtype)
-    data.append('price', price ? price.replace(',', '.') : '');
-    data.append('priceForTwo', priceForTwo ? priceForTwo.replace(',', '.') : '');
+    data.append('price', price ? price.replaceAll(",", ".") : '');
+    data.append('priceForTwo', priceForTwo ? priceForTwo.replaceAll(",", ".") : '');
 
     await api.post('/product', data, {
       headers: {
@@ -83,8 +83,8 @@ const WineDisheForm: React.FC<IMainDisheForm> = ({
       data.append('name', name ? name : '');
       data.append('type', type);
       data.append('subtype', subtype)
-      data.append('price', price ? price.replace(',', '.') : '');
-      data.append('priceForTwo', priceForTwo ? priceForTwo.replace(',', '.') : '');
+      data.append('price', price ? price.replaceAll(',', '.') : '');
+      data.append('priceForTwo', priceForTwo ? priceForTwo.replaceAll(',', '.') : '');
 
       await api.patch(`/product/${selectedProductId}`, data, {
         headers: {
@@ -116,8 +116,8 @@ const WineDisheForm: React.FC<IMainDisheForm> = ({
     data.append('name', name ? name : '');
     data.append('type', type);
     data.append('subtype', subtype)
-    data.append('price', price ? price.replace(',', '.') : '');
-    data.append('priceForTwo', priceForTwo ? priceForTwo.replace(',', '.') : '');
+    data.append('price', price ? price.replaceAll(',', '.') : '');
+    data.append('priceForTwo', priceForTwo ? priceForTwo.replaceAll(',', '.') : '');
 
     await api.patch(`/product/${selectedProductId}`, data, {
       headers: {

@@ -45,8 +45,8 @@ const MainDisheForm: React.FC<IMainDisheForm> = ({
     data.append('description', description ? description : '')
     data.append('type', type);
     data.append('subtype', subtype);
-    data.append('price', price ? price : '');
-    data.append('priceForTwo', priceForTwo ? priceForTwo : String((Number(price) * 0.7 + Number(price)).toFixed(2)));
+    data.append('price', price ? price.replaceAll(",", ".") : '');
+    data.append('priceForTwo', priceForTwo ? priceForTwo.replaceAll(",", ".") : String((Number(price) * 0.7 + Number(price)).toFixed(2)));
 
     await api.post('/product', data, {
       headers: {
@@ -87,8 +87,8 @@ const MainDisheForm: React.FC<IMainDisheForm> = ({
       data.append('description', description ? description : '')
       data.append('type', type);
       data.append('subtype', subtype);
-      data.append('price', price ? price : '');
-      data.append('priceForTwo', priceForTwo ? priceForTwo : String((Number(price) * 0.7 + Number(price)).toFixed(2)));
+      data.append('price', price ? price.replaceAll(",", ".") : '');
+      data.append('priceForTwo', priceForTwo ? priceForTwo.replaceAll(",", ".") : String((Number(price) * 0.7 + Number(price)).toFixed(2)));
 
       await api.patch(`/product/${selectedProductId}`, data, {
         headers: {
@@ -121,8 +121,8 @@ const MainDisheForm: React.FC<IMainDisheForm> = ({
     data.append('description', description ? description : '')
     data.append('type', type);
     data.append('subtype', subtype);
-    data.append('price', price ? price.replace(',', '.') : '');
-    data.append('priceForTwo', priceForTwo ? priceForTwo.replace(',', '.') : String((Number(price?.replace(',', '.')) * 0.7 + Number(price?.replace(',', '.'))).toFixed(2)));
+    data.append('price', price ? price.replaceAll(',', '.') : '');
+    data.append('priceForTwo', priceForTwo ? priceForTwo.replaceAll(',', '.') : String((Number(price?.replace(',', '.')) * 0.7 + Number(price?.replace(',', '.'))).toFixed(2)));
 
     await api.patch(`/product/${selectedProductId}`, data, {
       headers: {

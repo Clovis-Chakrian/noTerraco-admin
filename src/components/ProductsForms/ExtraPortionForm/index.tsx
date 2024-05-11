@@ -26,7 +26,7 @@ const ExtraPortionForm: React.FC<IDisheForm> = ({
     setIsLoading(true);
     const data = {
       name,
-      price: price?.replace(',', '.'),
+      price: price?.replaceAll(',', '.'),
       type
     }
 
@@ -59,7 +59,7 @@ const ExtraPortionForm: React.FC<IDisheForm> = ({
     setIsLoading(true);
     const data = {
       name,
-      price: price?.replace(',', '.'),
+      price: price?.replaceAll(',', '.'),
       type
     }
 

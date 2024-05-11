@@ -44,7 +44,7 @@ const DisheForm: React.FC<IDisheForm> = ({
     if (subtype !== '' && subtype !== null && subtype !== undefined) {
       data.append('subtype', subtype);
     };
-    data.append('price', price ? price : '');
+    data.append('price', price ? price.replaceAll(",", ".") : '');
 
     await api.post('/product', data, {
       headers: {
@@ -87,7 +87,7 @@ const DisheForm: React.FC<IDisheForm> = ({
       if (subtype !== '' && subtype !== null && subtype !== undefined) {
         data.append('subtype', subtype);
       };
-      data.append('price', price ? price.replace(',', '.') : '');
+      data.append('price', price ? price.replaceAll(',', '.') : '');
 
       await api.patch(`/product/${selectedProductId}`, data, {
         headers: {
@@ -133,7 +133,7 @@ const DisheForm: React.FC<IDisheForm> = ({
     if (subtype !== '' && subtype !== null && subtype !== undefined) {
       data.append('subtype', subtype);
     };
-    data.append('price', price ? price.replace(',', '.') : '');
+    data.append('price', price ? price.replaceAll(',', '.') : '');
 
     await api.patch(`/product/${selectedProductId}`, data, {
       headers: {
